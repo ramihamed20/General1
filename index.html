@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoneID — Anatomy Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Inconsolata:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06090f;--bg2:#080d17;--surface:#0d1421;--card:#111827;--card2:#162033;--border:#1e2d44;--border2:#2a3f5f;--blue:#38bdf8;--cyan:#06b6d4;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--orange:#f97316;--text:#e2e8f0;--muted:#64748b;--white:#f8fafc}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 10% 10%,rgba(56,189,248,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 80% at 90% 90%,rgba(6,182,212,.05) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 50% 50%,rgba(245,158,11,.03) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(56,189,248,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.screen{display:none;position:relative;z-index:1}.screen.active{display:flex}
+
+/* HOME */
+#home{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:60px 24px;gap:56px}
+.hero{text-align:center;animation:riseIn 1s cubic-bezier(.16,1,.3,1) both}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:6px 16px;border-radius:100px;font-family:‘Inconsolata’,monospace;font-size:12px;color:var(–blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(–blue);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 6px var(–blue)}50%{opacity:.4;box-shadow:none}}
+.hero-title{font-family:‘Barlow Condensed’,sans-serif;font-size:clamp(72px,12vw,140px);font-weight:900;letter-spacing:-3px;line-height:.9;color:var(–white)}
+.accent{background:linear-gradient(135deg,var(–blue) 0%,var(–cyan) 50%,var(–gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{margin-top:16px;font-size:15px;color:var(–muted);letter-spacing:.5px;font-weight:300}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,320px));gap:20px;justify-content:center;animation:riseIn 1s .15s cubic-bezier(.16,1,.3,1) both}
+.card{position:relative;background:var(–card);border:1px solid var(–border);border-radius:24px;padding:32px;cursor:pointer;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s}
+.card::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;opacity:0;transition:opacity .3s}
+.card-a::before{background:linear-gradient(90deg,transparent,var(–blue),transparent)}
+.card-b::before{background:linear-gradient(90deg,transparent,var(–gold),transparent)}
+.card:hover{transform:translateY(-8px)}.card:hover::before{opacity:1}
+.card-a:hover{border-color:rgba(56,189,248,.5);box-shadow:0 24px 60px rgba(56,189,248,.12)}
+.card-b:hover{border-color:rgba(245,158,11,.5);box-shadow:0 24px 60px rgba(245,158,11,.12)}
+.card-corner{position:absolute;top:20px;right:20px;font-size:36px;opacity:.15;transition:opacity .3s,transform .3s}.card:hover .card-corner{opacity:.3;transform:scale(1.2) rotate(-10deg)}
+.card-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;font-family:‘Inconsolata’,monospace;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.card-a .card-tag{background:rgba(56,189,248,.1);color:var(–blue);border:1px solid rgba(56,189,248,.2)}
+.card-b .card-tag{background:rgba(245,158,11,.1);color:var(–gold);border:1px solid rgba(245,158,11,.2)}
+.card-title{font-family:‘Barlow Condensed’,sans-serif;font-size:32px;font-weight:800;color:var(–white);letter-spacing:-.5px;margin-bottom:10px;line-height:1}
+.card-desc{font-size:14px;color:var(–muted);line-height:1.65;margin-bottom:28px;font-weight:300}
+.card-pills{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+.pill{padding:5px 12px;background:rgba(255,255,255,.04);border:1px solid var(–border);border-radius:100px;font-size:12px;font-family:‘Inconsolata’,monospace;color:var(–muted)}
+.card-btn{width:100%;padding:14px;border:none;border-radius:14px;font-family:‘Barlow Condensed’,sans-serif;font-size:17px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.card-a .card-btn{background:linear-gradient(135deg,var(–blue),var(–cyan));color:#06090f}
+.card-b .card-btn{background:linear-gradient(135deg,var(–gold),#fbbf24);color:#06090f}
+.card-btn:hover{filter:brightness(1.1);transform:scale(1.02)}.card-btn:active{transform:scale(.99)}
+.stats-row{display:flex;gap:48px;align-items:center;animation:riseIn 1s .3s cubic-bezier(.16,1,.3,1) both}
+.stat-div{width:1px;height:40px;background:var(–border)}
+.stat{text-align:center}
+.stat-n{font-family:‘Barlow Condensed’,sans-serif;font-size:40px;font-weight:800;color:var(–white);line-height:1}
+.stat-l{font-family:‘Inconsolata’,monospace;font-size:10px;color:var(–muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+
+/* QUIZ */
+#quiz{flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:16px;padding:14px 28px;background:rgba(8,13,23,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(–border);position:sticky;top:0;z-index:100}
+.btn-exit{background:none;border:1px solid var(–border);color:var(–muted);padding:8px 16px;border-radius:10px;cursor:pointer;font-family:‘Barlow Condensed’,sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all .2s;white-space:nowrap}
+.btn-exit:hover{color:var(–text);border-color:var(–border2)}
+.prog-wrap{flex:1;max-width:420px}
+.prog-meta{display:flex;justify-content:space-between;font-family:‘Inconsolata’,monospace;font-size:11px;color:var(–muted);margin-bottom:7px}
+.prog-track{height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(–blue),var(–cyan),var(–gold));border-radius:99px;transition:width .5s cubic-bezier(.16,1,.3,1);position:relative}
+.prog-fill::after{content:’’;position:absolute;right:0;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(–gold);box-shadow:0 0 8px var(–gold)}
+.timer{font-family:‘Barlow Condensed’,sans-serif;font-size:28px;font-weight:700;color:var(–blue);letter-spacing:2px;min-width:84px;text-align:center;transition:color .3s}
+.timer.warn{color:var(–orange);animation:pt 1s ease infinite}.timer.danger{color:var(–red);animation:pt .4s ease infinite}
+@keyframes pt{0%,100%{opacity:1}50%{opacity:.4}}
+.score-badges{display:flex;gap:8px}
+.badge{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-family:‘Inconsolata’,monospace;font-size:13px;font-weight:600}
+.bok{background:rgba(16,185,129,.12);color:var(–green);border:1px solid rgba(16,185,129,.2)}
+.berr{background:rgba(239,68,68,.12);color:var(–red);border:1px solid rgba(239,68,68,.2)}
+.quiz-body{flex:1;display:flex;flex-direction:column;align-items:center;padding:36px 20px 48px;gap:28px;max-width:820px;margin:0 auto;width:100%}
+.slide-id{display:flex;align-items:center;gap:12px;font-family:‘Inconsolata’,monospace;font-size:11px;color:var(–muted);letter-spacing:3px;text-transform:uppercase}
+.slide-id::before,.slide-id::after{content:’’;flex:1;height:1px}
+.slide-id::before{background:linear-gradient(90deg,transparent,var(–border))}
+.slide-id::after{background:linear-gradient(90deg,var(–border),transparent)}
+.viewer{width:100%;max-width:600px;border-radius:20px;overflow:hidden;position:relative;border:1px solid var(–border);background:var(–card);box-shadow:0 20px 60px rgba(0,0,0,.6);transition:box-shadow .4s,border-color .4s}
+.viewer.ok{border-color:rgba(16,185,129,.6);box-shadow:0 0 30px rgba(16,185,129,.15),0 20px 60px rgba(0,0,0,.6)}
+.viewer.err{border-color:rgba(239,68,68,.6);box-shadow:0 0 30px rgba(239,68,68,.15),0 20px 60px rgba(0,0,0,.6)}
+.viewer::before{content:’’;position:absolute;inset:0;background:linear-gradient(var(–blue),var(–blue)) top left/16px 1px no-repeat,linear-gradient(var(–blue),var(–blue)) top left/1px 16px no-repeat,linear-gradient(var(–blue),var(–blue)) top right/16px 1px no-repeat,linear-gradient(var(–blue),var(–blue)) top right/1px 16px no-repeat,linear-gradient(var(–blue),var(–blue)) bottom left/16px 1px no-repeat,linear-gradient(var(–blue),var(–blue)) bottom left/1px 16px no-repeat,linear-gradient(var(–blue),var(–blue)) bottom right/16px 1px no-repeat,linear-gradient(var(–blue),var(–blue)) bottom right/1px 16px no-repeat;opacity:.35;z-index:2;pointer-events:none;transition:opacity .3s}
+.viewer:hover::before{opacity:.7}
+.viewer-img{width:100%;height:auto;display:block;max-height:55vh;object-fit:contain;background:#f0f2f4}
+.view-label{position:absolute;top:14px;left:14px;z-index:3;background:rgba(6,9,15,.85);backdrop-filter:blur(8px);border:1px solid var(–border2);padding:5px 12px;border-radius:8px;font-family:‘Inconsolata’,monospace;font-size:11px;color:var(–blue);letter-spacing:1.5px;text-transform:uppercase}
+.fb-overlay{position:absolute;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:rgba(6,9,15,.55);backdrop-filter:blur(6px);animation:fadeIn .2s ease}
+.fb-overlay.on{display:flex}
+.fb-card{padding:28px 48px;border-radius:18px;text-align:center;animation:zoomIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.fb-card.ok{background:rgba(16,185,129,.15);border:2px solid var(–green)}
+.fb-card.err{background:rgba(239,68,68,.15);border:2px solid var(–red)}
+.fb-icon{font-size:40px;display:block;margin-bottom:6px}
+.fb-title{font-family:‘Barlow Condensed’,sans-serif;font-size:30px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.fb-card.ok .fb-title{color:var(–green)}.fb-card.err .fb-title{color:var(–red)}
+.fb-answer{margin-top:8px;font-family:‘Inconsolata’,monospace;font-size:14px;color:var(–text);opacity:.8}
+.input-zone{width:100%;max-width:540px;display:flex;flex-direction:column;gap:12px}
+.input-hint{font-family:‘Inconsolata’,monospace;font-size:11px;color:var(–muted);letter-spacing:2px;text-transform:uppercase;text-align:center}
+.input-row{display:flex;gap:10px}
+.ans-input{flex:1;background:var(–card);border:2px solid var(–border);color:var(–white);padding:16px 20px;border-radius:14px;font-family:‘Inconsolata’,monospace;font-size:18px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;caret-color:var(–blue)}
+.ans-input::placeholder{color:rgba(100,116,139,.5)}
+.ans-input:focus{border-color:var(–blue);box-shadow:0 0 0 4px rgba(56,189,248,.08);background:var(–card2)}
+.ans-input.ok{border-color:var(–green);background:rgba(16,185,129,.05)}
+.ans-input.err{border-color:var(–red);background:rgba(239,68,68,.05)}
+.ans-input:disabled{opacity:.5}
+.btn-check{padding:16px 24px;background:linear-gradient(135deg,var(–blue),var(–cyan));color:#06090f;border:none;border-radius:14px;font-family:‘Barlow Condensed’,sans-serif;font-size:16px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-check:hover{filter:brightness(1.12);transform:scale(1.03)}.btn-check:active{transform:scale(.98)}.btn-check:disabled{opacity:.3;cursor:not-allowed;transform:none;filter:none}
+.action-row{display:flex;gap:10px;justify-content:center}
+.btn-skip,.btn-next{padding:9px 22px;border-radius:10px;font-family:‘Barlow Condensed’,sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-skip{background:none;border:1px solid var(–border);color:var(–muted)}.btn-skip:hover{border-color:var(–border2);color:var(–text)}
+.btn-next{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);color:var(–blue);display:none}.btn-next:hover{background:rgba(56,189,248,.18)}.btn-next.on{display:block}
+.timeout-msg{display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(–red);padding:12px 24px;border-radius:12px;text-align:center;font-family:‘Inconsolata’,monospace;font-size:14px;letter-spacing:1px}
+.timeout-msg.on{display:block}
+
+/* RESULTS */
+#results{flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:48px 24px;gap:36px}
+.res-hero{text-align:center;animation:riseIn .7s cubic-bezier(.16,1,.3,1) both}
+.res-emoji{font-size:64px;display:block;margin-bottom:12px}
+.res-title{font-family:‘Barlow Condensed’,sans-serif;font-size:clamp(48px,8vw,80px);font-weight:900;letter-spacing:-2px;color:var(–white);line-height:.95}
+.res-sub{font-size:15px;color:var(–muted);margin-top:10px;font-weight:300}
+.res-boxes{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:riseIn .7s .1s cubic-bezier(.16,1,.3,1) both}
+.res-box{background:var(–card);border-radius:20px;padding:24px 36px;text-align:center;min-width:120px;border:1px solid var(–border);position:relative;overflow:hidden}
+.res-box::before{content:’’;position:absolute;top:0;left:0;right:0;height:2px}
+.res-box.ok::before{background:linear-gradient(90deg,transparent,var(–green),transparent)}
+.res-box.err::before{background:linear-gradient(90deg,transparent,var(–red),transparent)}
+.res-box.skip::before{background:linear-gradient(90deg,transparent,var(–blue),transparent)}
+.res-n{font-family:‘Barlow Condensed’,sans-serif;font-size:52px;font-weight:900;line-height:1}
+.res-box.ok .res-n{color:var(–green)}.res-box.err .res-n{color:var(–red)}.res-box.skip .res-n{color:var(–blue)}
+.res-l{font-family:‘Inconsolata’,monospace;font-size:10px;color:var(–muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.grade-wrap{animation:riseIn .7s .2s cubic-bezier(.16,1,.3,1) both}
+.grade-svg{transform:rotate(-90deg);overflow:visible}
+.grade-track{fill:none;stroke:var(–border);stroke-width:8}
+.grade-arc{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:440;stroke-dashoffset:440;transition:stroke-dashoffset 1.8s cubic-bezier(.16,1,.3,1)}
+.grade-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.grade-pct{font-family:‘Barlow Condensed’,sans-serif;font-size:42px;font-weight:900;color:var(–white);line-height:1}
+.grade-letter{font-family:‘Inconsolata’,monospace;font-size:13px;color:var(–muted);letter-spacing:2px}
+.review-wrap{width:100%;max-width:680px;background:var(–card);border:1px solid var(–border);border-radius:20px;overflow:hidden;animation:riseIn .7s .3s cubic-bezier(.16,1,.3,1) both;max-height:360px;overflow-y:auto}
+.review-head{padding:16px 22px;border-bottom:1px solid var(–border);font-family:‘Barlow Condensed’,sans-serif;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(–white);position:sticky;top:0;background:var(–card);z-index:1}
+.review-item{display:flex;align-items:center;gap:14px;padding:11px 22px;border-bottom:1px solid rgba(30,45,68,.5);font-size:13px;transition:background .15s}
+.review-item:hover{background:rgba(255,255,255,.02)}
+.r-num{font-family:‘Inconsolata’,monospace;font-size:11px;color:var(–muted);min-width:36px}
+.r-icon{font-size:14px;min-width:18px}.r-ok{color:var(–green)}.r-err{color:var(–red)}
+.r-body{flex:1}
+.r-ans{font-family:‘Inconsolata’,monospace;color:var(–text);font-size:13px}
+.r-user{color:var(–muted);font-size:11px;margin-top:2px}
+.res-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:riseIn .7s .4s cubic-bezier(.16,1,.3,1) both}
+.btn-retry{padding:16px 36px;background:linear-gradient(135deg,var(–blue),var(–cyan));color:#06090f;border:none;border-radius:14px;font-family:‘Barlow Condensed’,sans-serif;font-size:17px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-retry:hover{filter:brightness(1.1);transform:scale(1.03)}
+.btn-home{padding:16px 36px;background:none;border:1px solid var(–border2);color:var(–text);border-radius:14px;font-family:‘Barlow Condensed’,sans-serif;font-size:17px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-home:hover{border-color:var(–muted)}
+@keyframes riseIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes zoomIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(–bg)}::-webkit-scrollbar-thumb{background:var(–border2);border-radius:99px}
+</style>
+
+</head>
+<body>
+
+<div id="home" class="screen active">
+  <div class="hero">
+    <div class="hero-badge"><span class="pulse"></span>General Anatomy · Practical Exam</div>
+    <div class="hero-title">BONE<span class="accent">ID</span></div>
+    <div class="hero-sub">Identify skull &amp; mandible structures — sharpen your practical skills</div>
+  </div>
+  <div class="cards-grid">
+    <div class="card card-a" onclick="startQuiz('sprint')">
+      <div class="card-corner">⚡</div>
+      <div class="card-tag">⚡ Timed Mode</div>
+      <div class="card-title">Sprint Quiz</div>
+      <div class="card-desc">10 random slides. Race the clock. Tests speed and precision under pressure.</div>
+      <div class="card-pills"><span class="pill">10 Slides</span><span class="pill">5 Min Timer</span><span class="pill">Random Order</span></div>
+      <button class="card-btn">Start Sprint →</button>
+    </div>
+    <div class="card card-b" onclick="startQuiz('full')">
+      <div class="card-corner">📚</div>
+      <div class="card-tag">📚 Full Exam</div>
+      <div class="card-title">Complete Exam</div>
+      <div class="card-desc">All 121 slides. No time limit. Full coverage for your practical examination.</div>
+      <div class="card-pills"><span class="pill">121 Slides</span><span class="pill">No Timer</span><span class="pill">All Views</span></div>
+      <button class="card-btn">Start Full Exam →</button>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-n">121</div><div class="stat-l">Slides</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">10</div><div class="stat-l">Bone Types</div></div>
+    <div class="stat-div"></div>
+    <div class="stat"><div class="stat-n">6</div><div class="stat-l">Views</div></div>
+  </div>
+</div>
+
+<div id="quiz" class="screen">
+  <div class="topbar">
+    <button class="btn-exit" onclick="goHome()">← Exit</button>
+    <div class="prog-wrap">
+      <div class="prog-meta"><span id="prog-label">Q 1 / 10</span><span id="prog-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="timer" id="timer" style="display:none">5:00</div>
+    <div class="score-badges">
+      <div class="badge bok">✓ <span id="sc">0</span></div>
+      <div class="badge berr">✗ <span id="sw">0</span></div>
+    </div>
+  </div>
+  <div class="quiz-body">
+    <div class="timeout-msg" id="timeout-msg">⏰ TIME'S UP — LOADING RESULTS</div>
+    <div class="slide-id" id="slide-id">SLIDE 001</div>
+    <div class="viewer" id="viewer">
+      <img id="img" class="viewer-img" src="" alt="Anatomy Slide" />
+      <div class="view-label" id="view-label">Anterior View</div>
+      <div class="fb-overlay" id="fb-overlay">
+        <div class="fb-card" id="fb-card">
+          <span class="fb-icon" id="fb-icon">✓</span>
+          <div class="fb-title" id="fb-title">CORRECT</div>
+          <div class="fb-answer" id="fb-answer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="input-zone">
+      <div class="input-hint">Identify the marked structure (X)</div>
+      <div class="input-row">
+        <input id="ans" class="ans-input" type="text" placeholder="Type structure name..." autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="onKey(event)" />
+        <button class="btn-check" id="btn-check" onclick="check()">Check</button>
+      </div>
+      <div class="action-row">
+        <button class="btn-skip" id="btn-skip" onclick="skip()">Skip</button>
+        <button class="btn-next" id="btn-next" onclick="next()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="results" class="screen">
+  <div class="res-hero">
+    <span class="res-emoji" id="res-emoji">🎯</span>
+    <div class="res-title" id="res-title">QUIZ COMPLETE</div>
+    <div class="res-sub" id="res-sub">Here's your performance breakdown</div>
+  </div>
+  <div class="res-boxes">
+    <div class="res-box ok"><div class="res-n" id="r-ok">0</div><div class="res-l">Correct</div></div>
+    <div class="res-box err"><div class="res-n" id="r-err">0</div><div class="res-l">Wrong</div></div>
+    <div class="res-box skip"><div class="res-n" id="r-skip">0</div><div class="res-l">Skipped</div></div>
+  </div>
+  <div class="grade-wrap">
+    <div style="position:relative;width:160px;height:160px;">
+      <svg class="grade-svg" width="160" height="160" viewBox="0 0 160 160">
+        <circle class="grade-track" cx="80" cy="80" r="70"/>
+        <circle class="grade-arc" id="grade-arc" cx="80" cy="80" r="70"/>
+      </svg>
+      <div class="grade-center">
+        <div class="grade-pct" id="grade-pct">0%</div>
+        <div class="grade-letter" id="grade-letter">--</div>
+      </div>
+    </div>
+  </div>
+  <div class="review-wrap">
+    <div class="review-head">📋 Review</div>
+    <div id="review-list"></div>
+  </div>
+  <div class="res-btns">
+    <button class="btn-retry" onclick="retryMode()">↺ Try Again</button>
+    <button class="btn-home" onclick="goHome()">← Home</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  HOW TO ADD IMAGES:
+//  1. Create a folder called "images" next to this HTML file
+//  2. Name your images: 001.jpg, 002.jpg, 003.jpg ... 121.jpg
+//  3. Each number matches the "id" field in DATA below
+//  Example folder structure:
+//    index.html
+//    images/
+//      001.jpg   ← slide id:1
+//      002.jpg   ← slide id:2
+//      ...
+//      121.jpg   ← slide id:121
+//  Supported formats: .jpg  .png  .webp
+//  If you use .png instead of .jpg, change the src line in
+//  the load() function:  `images/${...}.jpg`  →  `images/${...}.png`
+// ============================================================
+
+// ============================================================
+//  HOW TO EDIT ANSWERS:
+//  Each line = { id: NUMBER, answer: "Correct Answer", view: "View Label" }
+//  - id       : slide number (matches image filename)
+//  - answer   : what the student must type (case-insensitive)
+//  - view     : label shown on the image (top-left badge)
+//  Answers are case-insensitive — "frontal bone" = "Frontal Bone" = "FRONTAL BONE"
+// ============================================================
+
+const DATA = [
+  // ── ANTERIOR VIEW ─────────────────────────────────────────
+  { id:  1, answer: "Frontal bone",           view: "Anterior" },
+  { id:  2, answer: "Parietal bone",          view: "Anterior" },
+  { id:  3, answer: "Glabella",           view: "Anterior" },
+  { id:  4, answer: "Nasion",             view: "Anterior" },
+  { id:  5, answer: "Nasal bone",             view: "Anterior" },
+  { id:  6, answer: "Infra orbital foramen",                view: "Anterior" },
+  { id:  7, answer: "Zygomatic process of maxilla",         view: "Anterior" },
+  { id:  8, answer: "Zygomatic bone",         view: "Anterior" },
+  { id:  9, answer: "Anterior nasal spine",   view: "Anterior" },
+  { id: 10, answer: "Alveolar process",                view: "Anterior" },
+  { id: 11, answer: "Maxilla",                view: "Anterior" },
+  { id: 12, answer: "Alveolar part of mandible",               view: "Anterior" },
+  { id: 13, answer: "Mandible",               view: "Anterior" },
+  { id: 14, answer: "Mental foramen",               view: "Anterior" },
+  { id: 15, answer: "Angle of mandible",               view: "Anterior" },
+  { id: 16, answer: "Oblique line",               view: "Anterior" },
+  { id: 17, answer: "Greater wing of sphenoid",           view: "Anterior" },
+  { id: 18, answer: "Temporal bone",          view: "Anterior" },
+  { id: 19, answer: "Vomer",          view: "Anterior" },
+  { id: 20, answer: "Superior orbital fissure",           view: "Anterior" },
+  { id: 21, answer: "Inferior orbital fissure",          view: "Anterior" },
+
+  // ── LATERAL VIEW ──────────────────────────────────────────
+  { id: 22, answer: "Frontal bone",           view: "Lateral" },
+  { id: 23, answer: "Coronal suture",          view: "Lateral" },
+  { id: 24, answer: "Parietal bone",          view: "Lateral" },
+  { id: 25, answer: "Pterion",          view: "Lateral" },
+  { id: 26, answer: "Lambdoid suture",         view: "Lateral" },
+  { id: 27, answer: "occipital bone",         view: "Lateral" },
+  { id: 28, answer: "squamous part of temporal bone",          view: "Lateral" },
+  { id: 29, answer: "Greater wing of sphenoid",          view: "Lateral" },
+  { id: 30, answer: "Asterion",         view: "Lateral" },
+  { id: 31, answer: "Zygomatic bone",          view: "Lateral" },
+  { id: 32, answer: "Temporal process of zygomatic bone",          view: "Lateral" },
+  { id: 33, answer: "Zygomatic process of temporal bone",          view: "Lateral" },
+  { id: 34, answer: "Nasal bone",          view: "Lateral" },
+  { id: 35, answer: "Maxilla",                view: "Lateral" },
+  { id: 36, answer: "Coronoid process",          view: "Lateral" },
+  { id: 37, answer: "Condylar process",          view: "Lateral" },
+  { id: 38, answer: "Ramus of mandible",               view: "Lateral" },
+  { id: 39, answer: "Angle of mandible",               view: "Lateral" },
+  { id: 40, answer: "Body of mandible",               view: "Lateral" },
+  { id: 41, answer: "Mental foramen",               view: "Lateral" },
+  { id: 42, answer: "Alveolar part of mandible",               view: "Lateral" },
+  { id: 43, answer: "Occipital suture",          view: "Lateral" },
+  { id: 44, answer: "Mastoid part of temporal bone",         view: "Lateral" },
+  { id: 45, answer: "Mastoid process",          view: "Lateral" },
+  { id: 46, answer: "Tympanic part of temporal bone",          view: "Lateral" },
+  { id: 47, answer: "Styloid process",               view: "Lateral" },
+  { id: 48, answer: "Infra orbital foramen",                view: "Lateral" },
+  { id: 49, answer: "Anterior nasal spine",                view: "Lateral" },
+
+  // ── POSTERIOR VIEW ────────────────────────────────────────
+  { id: 50, answer: "Parietal bone",          view: "Posterior" },
+  { id: 51, answer: "Sagittal suture",          view: "Posterior" },
+  { id: 52, answer: "Lambda",         view: "Posterior" },
+  { id: 53, answer: "Lambdoid suture",         view: "Posterior" },
+  { id: 54, answer: "Occipital bone",         view: "Posterior" },
+  { id: 55, answer: "Asterion",          view: "Posterior" },
+  { id: 56, answer: "Mastoid process",          view: "Posterior" },
+  { id: 57, answer: "Superior nuchal line",         view: "Posterior" },
+  { id: 58, answer: "Inferior nuchal line",         view: "Posterior" },
+
+  // ── LATERAL – TEMPORAL FOSSA ──────────────────────────────
+  { id: 59, answer: "Temporalis muscle",          view: "Lateral - Temporal fossa" },
+  { id: 60, answer: "Masseter muscle",         view: "Lateral - Temporal fossa" },
+  { id: 61, answer: "Buccinator muscle",                view: "Lateral - Temporal fossa" },
+  { id: 62, answer: "Orbicularis oculi",           view: "Lateral - Temporal fossa" },
+  { id: 63, answer: "Orbicularis oris muscle",                view: "Lateral - Temporal fossa" },
+
+  // ── SUPERIOR VIEW ─────────────────────────────────────────
+  { id: 64, answer: "Frontal bone",           view: "Superior" },
+  { id: 65, answer: "Coronal suture",         view: "Superior" },
+  { id: 66, answer: "Parietal bone",          view: "Superior" },
+  { id: 67, answer: "Sagittal suture",        view: "Superior" },
+  { id: 68, answer: "Lmabda",          view: "Superior" },
+  { id: 69, answer: "Lambdoid suture",          view: "Superior" },
+  { id: 70, answer: "Occipital bone",         view: "Superior" },
+  { id: 71, answer: "Bregma",        view: "Superior" },
+
+  // ── INTERNAL BASE ─────────────────────────────────────────
+  { id: 72, answer: "Optic canal",           view: "Internal base" },
+  { id: 73, answer: "Superior orbital fissure",          view: "Internal base" },
+  { id: 74, answer: "Foramen rotundum",          view: "Internal base" },
+  { id: 75, answer: "Foramen ovale",          view: "Internal base" },
+  { id: 76, answer: "Foramen spinosum",          view: "Internal base" },
+  { id: 77, answer: "Carotid canal",          view: "Internal base" },
+  { id: 78, answer: "Foramen lacerum",          view: "Internal base" },
+  { id: 79, answer: "Jugular foramen",         view: "Internal base" },
+  { id: 80, answer: "Hypoglossal canal",         view: "Internal base" },
+  { id: 81, answer: "Foramen magnum",         view: "Internal base" },
+
+  // ── MANDIBLE – LATERAL ────────────────────────────────────
+  { id:  82, answer: "Head of condyle",            view: "Mandible - Lateral" },
+  { id:  83, answer: "Pterygoid fovea",            view: "Mandible - Lateral" },
+  { id:  84, answer: "Condylar process",            view: "Mandible - Lateral" },
+  { id:  85, answer: "Neck of condyle",            view: "Mandible - Lateral" },
+  { id:  86, answer: "Mandibular notch",           view: "Mandible - Lateral" },
+  { id:  87, answer: "Ligula",           view: "Mandible - Lateral" },
+  { id:  88, answer: "Mandibular foramen",           view: "Mandible - Lateral" },
+  { id:  89, answer: "Mylohyoid groove",   view: "Mandible - Lateral" },
+  { id:  90, answer: "Coronoid process",           view: "Mandible - Lateral" },
+  { id:  91, answer: "Retro molar fossa",   view: "Mandible - Lateral" },
+  { id:  92, answer: "Oblique line",           view: "Mandible - Lateral" },
+  { id:  93, answer: "Submandibular fossa",           view: "Mandible - Lateral" },
+  { id:  94, answer: "Mylohyoid line",           view: "Mandible - Lateral" },
+  { id:  95, answer: "Sublingual fossa",           view: "Mandible - Lateral" },
+  { id:  96, answer: "Interalveolar septa",        view: "Mandible - Lateral" },
+  { id:  97, answer: "Alveolar part",            view: "Mandible - Lateral" },
+  { id:  98, answer: "Mental foramen",view: "Mandible - Lateral" },
+  { id:  99, answer: "Mental protuberance",view: "Mandible - Lateral" },
+  { id: 100, answer: "Mental tubercle",view: "Mandible - Lateral" },
+  { id: 101, answer: "Base of mandible",view: "Mandible - Lateral" },
+  { id: 102, answer: "Body",view: "Mandible - Lateral" },
+  { id: 103, answer: "Angle",          view: "Mandible - Lateral" },
+  { id: 104, answer: "ramus",  view: "Mandible - Lateral" },
+
+  // ── MANDIBLE – MEDIAL ─────────────────────────────────────
+  { id: 105, answer: "Coronoid process",           view: "Mandible - Medial" },
+  { id: 106, answer: "Head",            view: "Mandible - Medial" },
+  { id: 107, answer: "Neck",            view: "Mandible - Medial" },
+  { id: 108, answer: "Pterygoid fovea",          view: "Mandible - Medial" },
+  { id: 109, answer: "Condyle process",            view: "Mandible - Medial" },
+  { id: 110, answer: "Lingula",         view: "Mandible - Medial" },
+  { id: 111, answer: "Mandibular foramen",                    view: "Mandible - Medial" },
+  { id: 112, answer: "Mylohyoid groove",       view: "Mandible - Medial" },
+  { id: 113, answer: "Mandibular notch",           view: "Mandible - Medial" },
+  { id: 114, answer: "Angle",             view: "Mandible - Medial" },
+  { id: 115, answer: "genial tubercles",          view: "Mandible - Medial" },
+  { id: 116, answer: "Digastric fossa",view: "Mandible - Medial" },
+  { id: 117, answer: "Sublingual fossa",             view: "Mandible - Medial" },
+  { id: 118, answer: "Mylohyoid line",           view: "Mandible - Medial" },
+  { id: 119, answer: "Submandibular",           view: "Mandible - Medial" },
+  { id: 120, answer: "Body",view: "Mandible - Medial" },
+  { id: 121, answer: "Ramus",  view: "Mandible - Medial" },
+];
+
+// ── Detect mobile (to skip auto-focus so keyboard doesn't pop up) ──
+const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+let mode='sprint',slides=[],idx=0,sc={c:0,w:0,s:0},tmr=null,tl=300,done=false,log=[];
+const $=id=>document.getElementById(id);
+
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+function startQuiz(m){
+  mode=m; sc={c:0,w:0,s:0}; log=[];
+  slides = m==='sprint' ? shuffle(DATA).slice(0,10) : shuffle(DATA);
+  idx=0;
+  const T=$('timer');
+  if(m==='sprint'){T.style.display='block';tl=300;updT();startT();}
+  else{T.style.display='none';clearInterval(tmr);}
+  show('quiz'); load();
+}
+
+function startT(){clearInterval(tmr);tmr=setInterval(()=>{tl--;updT();if(tl<=0){clearInterval(tmr);tout();}},1000);}
+
+function updT(){
+  const m=String(Math.floor(tl/60)).padStart(2,'0'), s=String(tl%60).padStart(2,'0');
+  const el=$('timer'); el.textContent=`${m}:${s}`;
+  el.className='timer'+(tl<=30?' danger':tl<=60?' warn':'');
+}
+
+function tout(){$('timeout-msg').classList.add('on');$('ans').disabled=true;$('btn-check').disabled=true;setTimeout(()=>{$('timeout-msg').classList.remove('on');showRes();},2000);}
+
+function load(){
+  if(idx>=slides.length){showRes();return;}
+  done=false;
+  const sl=slides[idx], tot=slides.length;
+  const pct=Math.round(idx/tot*100);
+  $('prog-label').textContent=`Q ${idx+1} / ${tot}`;
+  $('prog-pct').textContent=pct+'%';
+  $('prog-fill').style.width=pct+'%';
+  $('sc').textContent=sc.c; $('sw').textContent=sc.w;
+  $('slide-id').textContent=`SLIDE ${String(sl.id).padStart(3,'0')}`;
+  $('view-label').textContent=sl.view||'View';
+  $('img').src=`images/${String(sl.id).padStart(3,'0')}.jpg`;
+  const a=$('ans');
+  a.value=''; a.disabled=false; a.className='ans-input';
+  // ── Don't auto-open keyboard on mobile ──────────────────
+  if(!isMobile) a.focus();
+  $('btn-check').disabled=false;
+  $('btn-skip').style.display='block';
+  $('btn-next').classList.remove('on');
+  $('viewer').className='viewer';
+  $('fb-overlay').className='fb-overlay';
+}
+
+// ── Case-insensitive comparison (also trims extra spaces) ──
+function norm(s){ return s.toLowerCase().trim().replace(/\s+/g,' '); }
+
+function check(){
+  if(done)return;
+  const val=$('ans').value.trim();
+  if(!val){$('ans').focus();return;}
+  done=true;
+  const sl=slides[idx];
+  const right = norm(val) === norm(sl.answer);
+  log.push({id:sl.id,right,ans:sl.answer,user:val,skipped:false});
+  if(right){sc.c++;$('ans').className='ans-input ok';$('viewer').className='viewer ok';showFB(true,sl.answer);}
+  else{sc.w++;$('ans').className='ans-input err';$('viewer').className='viewer err';showFB(false,sl.answer);}
+  $('sc').textContent=sc.c; $('sw').textContent=sc.w;
+  $('btn-check').disabled=true;
+  $('btn-skip').style.display='none';
+  $('btn-next').classList.add('on');
+}
+
+function showFB(ok,ans){
+  const c=$('fb-card');
+  c.className='fb-card '+(ok?'ok':'err');
+  $('fb-icon').textContent=ok?'✓':'✗';
+  $('fb-title').textContent=ok?'CORRECT':'WRONG';
+  $('fb-answer').textContent=ok?ans:`Answer: ${ans}`;
+  $('fb-overlay').className='fb-overlay on';
+  setTimeout(()=>{$('fb-overlay').className='fb-overlay';},1900);
+}
+
+function skip(){
+  if(done)return;
+  done=true;
+  const sl=slides[idx];
+  sc.s++;
+  log.push({id:sl.id,right:false,ans:sl.answer,user:'—',skipped:true});
+  $('btn-skip').style.display='none';
+  $('btn-next').classList.add('on');
+  $('btn-check').disabled=true;
+  $('ans').disabled=true;
+  const c=$('fb-card');
+  c.className='fb-card err';
+  $('fb-icon').textContent='—';
+  $('fb-title').textContent='SKIPPED';
+  $('fb-answer').textContent=`Answer: ${sl.answer}`;
+  $('fb-overlay').className='fb-overlay on';
+  setTimeout(()=>{$('fb-overlay').className='fb-overlay';},2000);
+}
+
+function next(){idx++;if(idx>=slides.length){clearInterval(tmr);showRes();}else load();}
+
+function onKey(e){if(e.key==='Enter'){done?next():check();}}
+
+function showRes(){
+  clearInterval(tmr);
+  const tot=slides.length;
+  const pct=tot>0?Math.round(sc.c/tot*100):0;
+  $('r-ok').textContent=sc.c; $('r-err').textContent=sc.w; $('r-skip').textContent=sc.s;
+  $('grade-pct').textContent=pct+'%';
+  let letter='F',emoji='💀';
+  if(pct>=95){letter='A+';emoji='🏆';}
+  else if(pct>=90){letter='A';emoji='⭐';}
+  else if(pct>=80){letter='B';emoji='💪';}
+  else if(pct>=70){letter='C';emoji='👍';}
+  else if(pct>=60){letter='D';emoji='😅';}
+  $('grade-letter').textContent=letter;
+  $('res-emoji').textContent=emoji;
+  $('res-title').textContent=pct>=80?'GREAT JOB':pct>=60?'KEEP GOING':'STUDY MORE';
+  $('res-sub').textContent=`${sc.c} / ${tot} correct — ${pct}%`;
+  const C=2*Math.PI*70;
+  setTimeout(()=>{
+    const arc=$('grade-arc');
+    arc.style.strokeDasharray=C;
+    arc.style.strokeDashoffset=C-(pct/100)*C;
+    arc.style.stroke=pct>=80?'var(--green)':pct>=60?'var(--gold)':'var(--red)';
+  },300);
+  $('review-list').innerHTML=log.map(r=>`
+    <div class="review-item">
+      <span class="r-num">#${String(r.id).padStart(3,'0')}</span>
+      <span class="r-icon ${r.right?'r-ok':'r-err'}">${r.right?'✓':r.skipped?'—':'✗'}</span>
+      <div class="r-body">
+        <div class="r-ans">${r.ans}</div>
+        ${!r.right&&!r.skipped?`<div class="r-user">You: "${r.user}"</div>`:''}
+      </div>
+    </div>`).join('');
+  show('results');
+}
+
+function retryMode(){startQuiz(mode);}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+function goHome(){clearInterval(tmr);show('home');}
+</script>
+
+</body>
+</html>
