@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkullID — General Anatomy Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #4f9fff;
+    --accent2: #7c5cfc;
+    --success: #22d68a;
+    --error: #ff4f6a;
+    --warn: #ffb84f;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --white: #ffffff;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Sans’, sans-serif;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+top: -200px; left: -200px;
+width: 600px; height: 600px;
+background: radial-gradient(circle, rgba(79,159,255,0.06) 0%, transparent 70%);
+pointer-events: none;
+z-index: 0;
+}
+body::after {
+content: ‘’;
+position: fixed;
+bottom: -200px; right: -200px;
+width: 600px; height: 600px;
+background: radial-gradient(circle, rgba(124,92,252,0.05) 0%, transparent 70%);
+pointer-events: none;
+z-index: 0;
+}
+
+.screen { display: none; position: relative; z-index: 1; }
+.screen.active { display: flex; }
+
+/* HOME */
+#home {
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 100vh;
+padding: 40px 20px;
+gap: 60px;
+}
+
+.logo-area { text-align: center; animation: fadeUp 0.8s ease both; }
+.logo-icon {
+font-size: 64px; display: block; margin-bottom: 16px;
+filter: drop-shadow(0 0 20px rgba(79,159,255,0.4));
+animation: pulse-glow 3s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+0%, 100% { filter: drop-shadow(0 0 20px rgba(79,159,255,0.4)); }
+50% { filter: drop-shadow(0 0 35px rgba(79,159,255,0.7)); }
+}
+.logo-title {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(42px, 6vw, 72px);
+font-weight: 800;
+letter-spacing: -2px;
+background: linear-gradient(135deg, var(–white) 0%, var(–accent) 60%, var(–accent2) 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+line-height: 1;
+}
+.logo-sub {
+font-size: 14px; color: var(–muted);
+letter-spacing: 3px; text-transform: uppercase;
+margin-top: 10px; font-family: ‘DM Mono’, monospace;
+}
+
+.mode-cards {
+display: flex; gap: 24px; flex-wrap: wrap;
+justify-content: center; animation: fadeUp 0.8s 0.2s ease both;
+}
+.mode-card {
+background: var(–card); border: 1px solid var(–border);
+border-radius: 20px; padding: 36px 32px; width: 300px;
+cursor: pointer; transition: all 0.3s ease;
+position: relative; overflow: hidden; text-align: left;
+}
+.mode-card::before {
+content: ‘’; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s;
+}
+.mode-card.sprint::before { background: linear-gradient(135deg, rgba(79,159,255,0.08), rgba(79,159,255,0.02)); }
+.mode-card.full::before { background: linear-gradient(135deg, rgba(124,92,252,0.08), rgba(124,92,252,0.02)); }
+.mode-card:hover { transform: translateY(-6px); border-color: transparent; }
+.mode-card.sprint:hover { border-color: var(–accent); box-shadow: 0 20px 40px rgba(79,159,255,0.15); }
+.mode-card.full:hover { border-color: var(–accent2); box-shadow: 0 20px 40px rgba(124,92,252,0.15); }
+.mode-card:hover::before { opacity: 1; }
+
+.mode-badge {
+display: inline-flex; align-items: center; gap: 6px;
+padding: 5px 12px; border-radius: 20px; font-size: 11px;
+font-weight: 600; font-family: ‘DM Mono’, monospace;
+letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px;
+}
+.sprint .mode-badge { background: rgba(79,159,255,0.15); color: var(–accent); }
+.full .mode-badge { background: rgba(124,92,252,0.15); color: var(–accent2); }
+
+.mode-title { font-family: ‘Syne’, sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 10px; color: var(–white); }
+.mode-desc { font-size: 14px; color: var(–muted); line-height: 1.6; margin-bottom: 24px; }
+.mode-meta { display: flex; gap: 16px; }
+.meta-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(–muted); font-family: ‘DM Mono’, monospace; }
+.meta-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+.sprint .dot { background: var(–accent); }
+.full .dot { background: var(–accent2); }
+
+.mode-btn {
+width: 100%; padding: 14px; border-radius: 12px; border: none;
+font-family: ‘Syne’, sans-serif; font-size: 15px; font-weight: 700;
+cursor: pointer; letter-spacing: 0.5px; margin-top: 24px; transition: all 0.2s;
+}
+.sprint .mode-btn { background: var(–accent); color: var(–bg); }
+.sprint .mode-btn:hover { background: #74b3ff; transform: scale(1.02); }
+.full .mode-btn { background: var(–accent2); color: var(–white); }
+.full .mode-btn:hover { background: #9578ff; transform: scale(1.02); }
+
+.home-stats { display: flex; gap: 40px; animation: fadeUp 0.8s 0.4s ease both; }
+.stat { text-align: center; }
+.stat-num { font-family: ‘Syne’, sans-serif; font-size: 32px; font-weight: 800; color: var(–white); }
+.stat-label { font-size: 11px; color: var(–muted); text-transform: uppercase; letter-spacing: 2px; font-family: ‘DM Mono’, monospace; }
+
+/* QUIZ */
+#quiz { flex-direction: column; min-height: 100vh; padding: 0; }
+
+.quiz-header {
+display: flex; align-items: center; justify-content: space-between;
+padding: 16px 28px; background: rgba(19,19,26,0.95);
+backdrop-filter: blur(20px); border-bottom: 1px solid var(–border);
+position: sticky; top: 0; z-index: 100; gap: 16px;
+}
+.quiz-back {
+display: flex; align-items: center; gap: 8px;
+background: none; border: 1px solid var(–border); color: var(–muted);
+padding: 8px 14px; border-radius: 8px; cursor: pointer;
+font-size: 13px; font-family: ‘DM Sans’, sans-serif;
+transition: all 0.2s; white-space: nowrap;
+}
+.quiz-back:hover { color: var(–text); border-color: var(–muted); }
+
+.quiz-progress-wrap { flex: 1; max-width: 400px; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(–muted); font-family: ‘DM Mono’, monospace; margin-bottom: 6px; }
+.progress-bar { height: 4px; background: var(–border); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(–accent), var(–accent2)); border-radius: 4px; transition: width 0.4s ease; }
+
+.timer-display {
+font-family: ‘DM Mono’, monospace; font-size: 24px; font-weight: 500;
+color: var(–accent); min-width: 80px; text-align: center;
+letter-spacing: 2px; transition: color 0.3s;
+}
+.timer-display.warning { color: var(–warn); animation: tick 1s ease infinite; }
+.timer-display.danger { color: var(–error); animation: tick 0.5s ease infinite; }
+@keyframes tick { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+.score-display { display: flex; gap: 12px; font-size: 12px; font-family: ‘DM Mono’, monospace; white-space: nowrap; }
+.score-correct { color: var(–success); }
+.score-wrong { color: var(–error); }
+
+.quiz-main {
+flex: 1; display: flex; flex-direction: column; align-items: center;
+padding: 32px 20px; gap: 28px; max-width: 900px; margin: 0 auto; width: 100%;
+}
+
+.slide-counter { font-family: ‘Syne’, sans-serif; font-size: 13px; color: var(–muted); letter-spacing: 2px; text-transform: uppercase; }
+
+.image-frame {
+width: 100%; max-width: 620px; background: var(–card);
+border: 1px solid var(–border); border-radius: 20px; overflow: hidden;
+position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5); transition: border-color 0.3s;
+}
+.image-frame.correct-frame { border-color: var(–success); box-shadow: 0 20px 60px rgba(34,214,138,0.2); }
+.image-frame.wrong-frame { border-color: var(–error); box-shadow: 0 20px 60px rgba(255,79,106,0.2); }
+.image-frame img { width: 100%; height: auto; display: block; max-height: 60vh; object-fit: contain; background: #f5f5f0; }
+
+.view-tag {
+position: absolute; top: 12px; left: 12px;
+background: rgba(10,10,15,0.85); backdrop-filter: blur(10px);
+border: 1px solid var(–border); padding: 5px 12px; border-radius: 20px;
+font-size: 11px; font-family: ‘DM Mono’, monospace; color: var(–muted); letter-spacing: 1px;
+}
+
+.feedback-overlay {
+position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+background: rgba(10,10,15,0.6); backdrop-filter: blur(4px);
+border-radius: 20px; animation: fadeIn 0.3s ease;
+}
+.feedback-overlay.show { display: flex; }
+.feedback-pill {
+padding: 20px 40px; border-radius: 16px; font-family: ‘Syne’, sans-serif;
+font-size: 28px; font-weight: 800; text-align: center;
+animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.feedback-pill.correct { background: rgba(34,214,138,0.2); border: 2px solid var(–success); color: var(–success); }
+.feedback-pill.wrong { background: rgba(255,79,106,0.2); border: 2px solid var(–error); color: var(–error); }
+.feedback-pill .correct-answer { display: block; font-size: 14px; font-family: ‘DM Mono’, monospace; font-weight: 400; color: var(–text); margin-top: 8px; opacity: 0.8; }
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.input-area { width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 14px; }
+.input-label { font-size: 12px; color: var(–muted); font-family: ‘DM Mono’, monospace; letter-spacing: 2px; text-transform: uppercase; }
+.answer-row { display: flex; gap: 12px; }
+.answer-input {
+flex: 1; background: var(–card); border: 2px solid var(–border);
+color: var(–white); padding: 16px 20px; border-radius: 14px;
+font-family: ‘DM Mono’, monospace; font-size: 17px; outline: none;
+transition: border-color 0.2s, box-shadow 0.2s; letter-spacing: 0.5px;
+}
+.answer-input:focus { border-color: var(–accent); box-shadow: 0 0 0 4px rgba(79,159,255,0.1); }
+.answer-input.correct { border-color: var(–success); background: rgba(34,214,138,0.05); }
+.answer-input.wrong { border-color: var(–error); background: rgba(255,79,106,0.05); }
+.answer-input:disabled { opacity: 0.6; }
+
+.submit-btn {
+padding: 16px 28px; background: var(–accent); color: var(–bg);
+border: none; border-radius: 14px; font-family: ‘Syne’, sans-serif;
+font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.submit-btn:hover { background: #74b3ff; transform: scale(1.03); }
+.submit-btn:active { transform: scale(0.98); }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.skip-row { display: flex; gap: 12px; justify-content: center; }
+.skip-btn {
+background: none; border: 1px solid var(–border); color: var(–muted);
+padding: 9px 20px; border-radius: 10px; font-size: 13px; cursor: pointer;
+font-family: ‘DM Sans’, sans-serif; transition: all 0.2s;
+}
+.skip-btn:hover { border-color: var(–muted); color: var(–text); }
+.next-btn {
+background: var(–surface); border: 1px solid var(–border); color: var(–text);
+padding: 9px 20px; border-radius: 10px; font-size: 13px; cursor: pointer;
+font-family: ‘DM Sans’, sans-serif; transition: all 0.2s; display: none;
+}
+.next-btn:hover { border-color: var(–accent); color: var(–accent); }
+.next-btn.show { display: block; }
+
+/* RESULTS */
+#results {
+flex-direction: column; align-items: center; justify-content: center;
+min-height: 100vh; padding: 40px 20px; gap: 40px;
+}
+.results-hero { text-align: center; animation: fadeUp 0.6s ease both; }
+.results-emoji { font-size: 72px; display: block; margin-bottom: 16px; }
+.results-title { font-family: ‘Syne’, sans-serif; font-size: 48px; font-weight: 800; color: var(–white); margin-bottom: 8px; }
+.results-sub { font-size: 15px; color: var(–muted); }
+
+.results-stats { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.1s ease both; }
+.result-box { background: var(–card); border: 1px solid var(–border); border-radius: 16px; padding: 24px 32px; text-align: center; min-width: 130px; }
+.result-box.green { border-color: rgba(34,214,138,0.3); }
+.result-box.red { border-color: rgba(255,79,106,0.3); }
+.result-box.blue { border-color: rgba(79,159,255,0.3); }
+.result-num { font-family: ‘Syne’, sans-serif; font-size: 42px; font-weight: 800; }
+.result-box.green .result-num { color: var(–success); }
+.result-box.red .result-num { color: var(–error); }
+.result-box.blue .result-num { color: var(–accent); }
+.result-label { font-size: 11px; color: var(–muted); text-transform: uppercase; letter-spacing: 2px; font-family: ‘DM Mono’, monospace; margin-top: 4px; }
+
+.results-grade { animation: fadeUp 0.6s 0.2s ease both; }
+.grade-ring { width: 160px; height: 160px; position: relative; margin: 0 auto; }
+.grade-ring svg { transform: rotate(-90deg); }
+.grade-ring circle { fill: none; stroke-width: 10; stroke-linecap: round; }
+.grade-ring .bg-circle { stroke: var(–border); }
+.grade-ring .progress-circle { stroke: var(–accent); stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.grade-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.grade-pct { font-family: ‘Syne’, sans-serif; font-size: 36px; font-weight: 800; color: var(–white); }
+.grade-letter { font-family: ‘DM Mono’, monospace; font-size: 14px; color: var(–muted); }
+
+.results-review {
+width: 100%; max-width: 700px; background: var(–card);
+border: 1px solid var(–border); border-radius: 16px; overflow: hidden;
+animation: fadeUp 0.6s 0.3s ease both; max-height: 380px; overflow-y: auto;
+}
+.review-header { padding: 16px 20px; border-bottom: 1px solid var(–border); font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 700; color: var(–white); position: sticky; top: 0; background: var(–card); z-index: 1; }
+.review-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid rgba(42,42,58,0.5); font-size: 13px; }
+.review-num { font-family: ‘DM Mono’, monospace; color: var(–muted); font-size: 11px; min-width: 32px; }
+.review-icon { font-size: 16px; min-width: 20px; }
+.review-correct { color: var(–success); }
+.review-wrong { color: var(–error); }
+.review-answers { flex: 1; }
+.review-right-ans { color: var(–text); font-family: ‘DM Mono’, monospace; font-size: 13px; }
+.review-user-ans { color: var(–muted); font-size: 11px; margin-top: 2px; }
+
+.results-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.4s ease both; }
+.action-btn { padding: 14px 28px; border-radius: 12px; font-family: ‘Syne’, sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; }
+.action-btn.primary { background: var(–accent); color: var(–bg); }
+.action-btn.primary:hover { background: #74b3ff; transform: scale(1.03); }
+.action-btn.secondary { background: var(–surface); border: 1px solid var(–border); color: var(–text); }
+.action-btn.secondary:hover { border-color: var(–muted); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(–bg); }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
+
+.timeout-banner { display: none; background: rgba(255,79,106,0.1); border: 1px solid rgba(255,79,106,0.3); color: var(–error); padding: 12px 20px; border-radius: 10px; text-align: center; font-family: ‘DM Mono’, monospace; font-size: 14px; }
+.timeout-banner.show { display: block; }
+</style>
+
+</head>
+<body>
+
+<!-- HOME -->
+
+<div id="home" class="screen active">
+  <div class="logo-area">
+    <span class="logo-icon">💀</span>
+    <div class="logo-title">SkullID</div>
+    <div class="logo-sub">General Anatomy · Skull & Mandible Identification</div>
+  </div>
+  <div class="mode-cards">
+    <div class="mode-card sprint" onclick="startQuiz('sprint')">
+      <div class="mode-badge">⚡ Timed Mode</div>
+      <div class="mode-title">Sprint Quiz</div>
+      <div class="mode-desc">10 random slides. Identify each bone before time runs out. Tests speed and precision.</div>
+      <div class="mode-meta">
+        <span class="meta-chip"><span class="dot"></span>10 Slides</span>
+        <span class="meta-chip"><span class="dot"></span>5 Minutes</span>
+      </div>
+      <button class="mode-btn">Start Sprint →</button>
+    </div>
+    <div class="mode-card full" onclick="startQuiz('full')">
+      <div class="mode-badge">📚 Full Mode</div>
+      <div class="mode-title">Complete Exam</div>
+      <div class="mode-desc">All 121 slides in random order. No time limit. Full preparation for your practical exam.</div>
+      <div class="mode-meta">
+        <span class="meta-chip"><span class="dot"></span>121 Slides</span>
+        <span class="meta-chip"><span class="dot"></span>No Timer</span>
+      </div>
+      <button class="mode-btn">Start Full Exam →</button>
+    </div>
+  </div>
+  <div class="home-stats">
+    <div class="stat"><div class="stat-num">121</div><div class="stat-label">Slides</div></div>
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Bone Types</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">Views</div></div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <button class="quiz-back" onclick="goHome()">← Exit</button>
+    <div class="quiz-progress-wrap">
+      <div class="progress-labels">
+        <span id="prog-label">Question 1 of 10</span>
+        <span id="prog-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="timer-display" id="timer-display" style="display:none">5:00</div>
+    <div class="score-display">
+      <span class="score-correct">✓ <span id="score-c">0</span></span>
+      <span class="score-wrong">✗ <span id="score-w">0</span></span>
+    </div>
+  </div>
+  <div class="quiz-main">
+    <div class="timeout-banner" id="timeout-banner">⏰ Time's up! Moving to results...</div>
+    <div class="slide-counter" id="slide-counter">SLIDE 001</div>
+    <div class="image-frame" id="image-frame">
+      <img id="slide-img" src="" alt="Anatomy slide" />
+      <div class="view-tag" id="view-tag">Anterior View</div>
+      <div class="feedback-overlay" id="feedback-overlay">
+        <div class="feedback-pill" id="feedback-pill">
+          ✓ Correct!
+          <span class="correct-answer" id="correct-answer-display"></span>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-label">Identify the marked structure (X)</div>
+      <div class="answer-row">
+        <input type="text" id="answer-input" class="answer-input"
+          placeholder="Type structure name..."
+          autocomplete="off" autocorrect="off" spellcheck="false"
+          onkeydown="handleKey(event)" />
+        <button class="submit-btn" id="submit-btn" onclick="checkAnswer()">Check →</button>
+      </div>
+      <div class="skip-row">
+        <button class="skip-btn" id="skip-btn" onclick="skipSlide()">Skip</button>
+        <button class="next-btn" id="next-btn" onclick="nextSlide()">Next slide →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+
+<div id="results" class="screen">
+  <div class="results-hero">
+    <span class="results-emoji" id="results-emoji">🎯</span>
+    <div class="results-title" id="results-title">Quiz Complete!</div>
+    <div class="results-sub" id="results-sub">Here's how you did</div>
+  </div>
+  <div class="results-stats">
+    <div class="result-box green"><div class="result-num" id="res-correct">0</div><div class="result-label">Correct</div></div>
+    <div class="result-box red"><div class="result-num" id="res-wrong">0</div><div class="result-label">Wrong</div></div>
+    <div class="result-box blue"><div class="result-num" id="res-skipped">0</div><div class="result-label">Skipped</div></div>
+  </div>
+  <div class="results-grade">
+    <div class="grade-ring">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="bg-circle" cx="80" cy="80" r="70"/>
+        <circle class="progress-circle" id="grade-circle" cx="80" cy="80" r="70"/>
+      </svg>
+      <div class="grade-center">
+        <div class="grade-pct" id="grade-pct">0%</div>
+        <div class="grade-letter" id="grade-letter">--</div>
+      </div>
+    </div>
+  </div>
+  <div class="results-review">
+    <div class="review-header">📋 Review</div>
+    <div id="review-list"></div>
+  </div>
+  <div class="results-actions">
+    <button class="action-btn primary" onclick="retryMode()">Try Again ↺</button>
+    <button class="action-btn secondary" onclick="goHome()">← Home</button>
+  </div>
+</div>
+
+<script>
+// ===== ALL 121 SLIDES EMBEDDED =====
+const SLIDES_DATA = [
+  {"id":1,"answer":"Frontal bone","view":"Anterior"},
+  {"id":2,"answer":"Parietal bone","view":"Anterior"},
+  {"id":3,"answer":"Frontal bone","view":"Anterior"},
+  {"id":4,"answer":"Nasal bone","view":"Anterior"},
+  {"id":5,"answer":"Nasal bone","view":"Anterior"},
+  {"id":6,"answer":"Maxilla","view":"Anterior"},
+  {"id":7,"answer":"Zygomatic bone","view":"Anterior"},
+  {"id":8,"answer":"Zygomatic bone","view":"Anterior"},
+  {"id":9,"answer":"Anterior nasal spine","view":"Anterior"},
+  {"id":10,"answer":"Maxilla","view":"Anterior"},
+  {"id":11,"answer":"Maxilla","view":"Anterior"},
+  {"id":12,"answer":"Mandible","view":"Anterior"},
+  {"id":13,"answer":"Mandible","view":"Anterior"},
+  {"id":14,"answer":"Mandible","view":"Anterior"},
+  {"id":15,"answer":"Mandible","view":"Anterior"},
+  {"id":16,"answer":"Mandible","view":"Anterior"},
+  {"id":17,"answer":"Ethmoid bone","view":"Anterior"},
+  {"id":18,"answer":"Temporal bone","view":"Anterior"},
+  {"id":19,"answer":"Lacrimal bone","view":"Anterior"},
+  {"id":20,"answer":"Ethmoid bone","view":"Anterior"},
+  {"id":21,"answer":"Lacrimal bone","view":"Anterior"},
+  {"id":22,"answer":"Frontal bone","view":"Lateral"},
+  {"id":23,"answer":"Parietal bone","view":"Lateral"},
+  {"id":24,"answer":"Parietal bone","view":"Lateral"},
+  {"id":25,"answer":"Temporal bone","view":"Lateral"},
+  {"id":26,"answer":"Occipital bone","view":"Lateral"},
+  {"id":27,"answer":"Occipital bone","view":"Lateral"},
+  {"id":28,"answer":"Temporal bone","view":"Lateral"},
+  {"id":29,"answer":"Sphenoid bone","view":"Lateral"},
+  {"id":30,"answer":"Occipital bone","view":"Lateral"},
+  {"id":31,"answer":"Sphenoid bone","view":"Lateral"},
+  {"id":32,"answer":"Sphenoid bone","view":"Lateral"},
+  {"id":33,"answer":"Temporal bone","view":"Lateral"},
+  {"id":34,"answer":"Lacrimal bone","view":"Lateral"},
+  {"id":35,"answer":"Maxilla","view":"Lateral"},
+  {"id":36,"answer":"Sphenoid bone","view":"Lateral"},
+  {"id":37,"answer":"Temporal bone","view":"Lateral"},
+  {"id":38,"answer":"Mandible","view":"Lateral"},
+  {"id":39,"answer":"Mandible","view":"Lateral"},
+  {"id":40,"answer":"Mandible","view":"Lateral"},
+  {"id":41,"answer":"Mandible","view":"Lateral"},
+  {"id":42,"answer":"Mandible","view":"Lateral"},
+  {"id":43,"answer":"Temporal bone","view":"Lateral"},
+  {"id":44,"answer":"Occipital bone","view":"Lateral"},
+  {"id":45,"answer":"Temporal bone","view":"Lateral"},
+  {"id":46,"answer":"Temporal bone","view":"Lateral"},
+  {"id":47,"answer":"Mandible","view":"Lateral"},
+  {"id":48,"answer":"Maxilla","view":"Lateral"},
+  {"id":49,"answer":"Maxilla","view":"Lateral"},
+  {"id":50,"answer":"Parietal bone","view":"Posterior"},
+  {"id":51,"answer":"Parietal bone","view":"Posterior"},
+  {"id":52,"answer":"Occipital bone","view":"Posterior"},
+  {"id":53,"answer":"Occipital bone","view":"Posterior"},
+  {"id":54,"answer":"Occipital bone","view":"Posterior"},
+  {"id":55,"answer":"Temporal bone","view":"Posterior"},
+  {"id":56,"answer":"Temporal bone","view":"Posterior"},
+  {"id":57,"answer":"Occipital bone","view":"Posterior"},
+  {"id":58,"answer":"Occipital bone","view":"Posterior"},
+  {"id":59,"answer":"Temporal bone","view":"Lateral - Temporal fossa"},
+  {"id":60,"answer":"Zygomatic arch","view":"Lateral - Temporal fossa"},
+  {"id":61,"answer":"Maxilla","view":"Lateral - Temporal fossa"},
+  {"id":62,"answer":"Frontal bone","view":"Lateral - Temporal fossa"},
+  {"id":63,"answer":"Maxilla","view":"Lateral - Temporal fossa"},
+  {"id":64,"answer":"Frontal bone","view":"Superior"},
+  {"id":65,"answer":"Coronal suture","view":"Superior"},
+  {"id":66,"answer":"Parietal bone","view":"Superior"},
+  {"id":67,"answer":"Sagittal suture","view":"Superior"},
+  {"id":68,"answer":"Parietal bone","view":"Superior"},
+  {"id":69,"answer":"Parietal bone","view":"Superior"},
+  {"id":70,"answer":"Occipital bone","view":"Superior"},
+  {"id":71,"answer":"Lambdoid suture","view":"Superior"},
+  {"id":72,"answer":"Frontal bone","view":"Internal base"},
+  {"id":73,"answer":"Sphenoid bone","view":"Internal base"},
+  {"id":74,"answer":"Sphenoid bone","view":"Internal base"},
+  {"id":75,"answer":"Temporal bone","view":"Internal base"},
+  {"id":76,"answer":"Temporal bone","view":"Internal base"},
+  {"id":77,"answer":"Temporal bone","view":"Internal base"},
+  {"id":78,"answer":"Temporal bone","view":"Internal base"},
+  {"id":79,"answer":"Occipital bone","view":"Internal base"},
+  {"id":80,"answer":"Occipital bone","view":"Internal base"},
+  {"id":81,"answer":"Occipital bone","view":"Internal base"},
+  {"id":82,"answer":"Head of condyle","view":"Mandible - Lateral"},
+  {"id":83,"answer":"Neck of condyle","view":"Mandible - Lateral"},
+  {"id":84,"answer":"Head of condyle","view":"Mandible - Lateral"},
+  {"id":85,"answer":"Neck of condyle","view":"Mandible - Lateral"},
+  {"id":86,"answer":"Mandibular notch","view":"Mandible - Lateral"},
+  {"id":87,"answer":"Coronoid process","view":"Mandible - Lateral"},
+  {"id":88,"answer":"Coronoid process","view":"Mandible - Lateral"},
+  {"id":89,"answer":"Anterior border of ramus","view":"Mandible - Lateral"},
+  {"id":90,"answer":"Coronoid process","view":"Mandible - Lateral"},
+  {"id":91,"answer":"Anterior border of ramus","view":"Mandible - Lateral"},
+  {"id":92,"answer":"Body of mandible","view":"Mandible - Lateral"},
+  {"id":93,"answer":"Alveolar process","view":"Mandible - Lateral"},
+  {"id":94,"answer":"Alveolar process","view":"Mandible - Lateral"},
+  {"id":95,"answer":"Alveolar process","view":"Mandible - Lateral"},
+  {"id":96,"answer":"Mental protuberance","view":"Mandible - Lateral"},
+  {"id":97,"answer":"Symphysis menti","view":"Mandible - Lateral"},
+  {"id":98,"answer":"Inferior border of mandible","view":"Mandible - Lateral"},
+  {"id":99,"answer":"Inferior border of mandible","view":"Mandible - Lateral"},
+  {"id":100,"answer":"Inferior border of mandible","view":"Mandible - Lateral"},
+  {"id":101,"answer":"Inferior border of mandible","view":"Mandible - Lateral"},
+  {"id":102,"answer":"Inferior border of mandible","view":"Mandible - Lateral"},
+  {"id":103,"answer":"Angle of mandible","view":"Mandible - Lateral"},
+  {"id":104,"answer":"Posterior border of ramus","view":"Mandible - Lateral"},
+  {"id":105,"answer":"Coronoid process","view":"Mandible - Medial"},
+  {"id":106,"answer":"Head of condyle","view":"Mandible - Medial"},
+  {"id":107,"answer":"Neck of condyle","view":"Mandible - Medial"},
+  {"id":108,"answer":"Ramus of mandible","view":"Mandible - Medial"},
+  {"id":109,"answer":"Head of condyle","view":"Mandible - Medial"},
+  {"id":110,"answer":"Mandibular foramen","view":"Mandible - Medial"},
+  {"id":111,"answer":"Lingula","view":"Mandible - Medial"},
+  {"id":112,"answer":"Pterygoid tuberosity","view":"Mandible - Medial"},
+  {"id":113,"answer":"Mandibular notch","view":"Mandible - Medial"},
+  {"id":114,"answer":"Mylohyoid line","view":"Mandible - Medial"},
+  {"id":115,"answer":"Angle of mandible","view":"Mandible - Medial"},
+  {"id":116,"answer":"Inferior border of mandible","view":"Mandible - Medial"},
+  {"id":117,"answer":"Mylohyoid line","view":"Mandible - Medial"},
+  {"id":118,"answer":"Mylohyoid groove","view":"Mandible - Medial"},
+  {"id":119,"answer":"Body of mandible","view":"Mandible - Medial"},
+  {"id":120,"answer":"Inferior border of mandible","view":"Mandible - Medial"},
+  {"id":121,"answer":"Posterior border of ramus","view":"Mandible - Medial"}
+];
+
+let currentMode = 'sprint';
+let quizSlides = [];
+let currentIndex = 0;
+let score = { correct: 0, wrong: 0, skipped: 0 };
+let timerInterval = null;
+let timeLeft = 300;
+let answered = false;
+let reviewData = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(mode) {
+  currentMode = mode;
+  score = { correct: 0, wrong: 0, skipped: 0 };
+  reviewData = [];
+
+  quizSlides = mode === 'sprint'
+    ? shuffle(SLIDES_DATA).slice(0, 10)
+    : shuffle(SLIDES_DATA);
+
+  currentIndex = 0;
+
+  const timerEl = document.getElementById('timer-display');
+  if (mode === 'sprint') {
+    timerEl.style.display = 'block';
+    timeLeft = 300;
+    updateTimerDisplay();
+    startTimer();
+  } else {
+    timerEl.style.display = 'none';
+    clearInterval(timerInterval);
+  }
+
+  showScreen('quiz');
+  loadSlide();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInterval); timeoutQuiz(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+  const s = (timeLeft % 60).toString().padStart(2, '0');
+  const el = document.getElementById('timer-display');
+  el.textContent = `${m}:${s}`;
+  el.className = 'timer-display';
+  if (timeLeft <= 30) el.classList.add('danger');
+  else if (timeLeft <= 60) el.classList.add('warning');
+}
+
+function timeoutQuiz() {
+  const banner = document.getElementById('timeout-banner');
+  banner.classList.add('show');
+  document.getElementById('answer-input').disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+  setTimeout(() => { banner.classList.remove('show'); showResults(); }, 2000);
+}
+
+function loadSlide() {
+  if (currentIndex >= quizSlides.length) { showResults(); return; }
+  answered = false;
+  const slide = quizSlides[currentIndex];
+  const total = quizSlides.length;
+
+  document.getElementById('prog-label').textContent = `Question ${currentIndex + 1} of ${total}`;
+  const pct = Math.round((currentIndex / total) * 100);
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('score-c').textContent = score.correct;
+  document.getElementById('score-w').textContent = score.wrong;
+  document.getElementById('slide-counter').textContent = `SLIDE ${String(slide.id).padStart(3,'0')}`;
+  document.getElementById('view-tag').textContent = slide.view || 'Skull View';
+  document.getElementById('slide-img').src = `images/${String(slide.id).padStart(3,'0')}.jpg`;
+
+  const input = document.getElementById('answer-input');
+  input.value = '';
+  input.disabled = false;
+  input.className = 'answer-input';
+  input.focus();
+
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('skip-btn').style.display = 'block';
+  document.getElementById('next-btn').classList.remove('show');
+  document.getElementById('image-frame').className = 'image-frame';
+  document.getElementById('feedback-overlay').className = 'feedback-overlay';
+}
+
+function checkAnswer() {
+  if (answered) return;
+  const input = document.getElementById('answer-input');
+  const userAnswer = input.value.trim();
+  if (!userAnswer) { input.focus(); return; }
+
+  answered = true;
+  const slide = quizSlides[currentIndex];
+  const correct = slide.answer;
+  const isCorrect = normalize(userAnswer) === normalize(correct);
+
+  reviewData.push({ id: slide.id, correct: isCorrect, correctAnswer: correct, userAnswer, skipped: false });
+
+  if (isCorrect) {
+    score.correct++;
+    input.className = 'answer-input correct';
+    document.getElementById('image-frame').className = 'image-frame correct-frame';
+    showFeedback(true, correct);
+  } else {
+    score.wrong++;
+    input.className = 'answer-input wrong';
+    document.getElementById('image-frame').className = 'image-frame wrong-frame';
+    showFeedback(false, correct);
+  }
+
+  document.getElementById('score-c').textContent = score.correct;
+  document.getElementById('score-w').textContent = score.wrong;
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('skip-btn').style.display = 'none';
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function normalize(str) {
+  return str.toLowerCase().trim()
+    .replace(/\s+/g, ' ')
+    .replace(/\bbone\b/gi, '').trim();
+}
+
+function showFeedback(correct, answer) {
+  const overlay = document.getElementById('feedback-overlay');
+  const pill = document.getElementById('feedback-pill');
+  const ansDisplay = document.getElementById('correct-answer-display');
+  pill.className = correct ? 'feedback-pill correct' : 'feedback-pill wrong';
+  pill.childNodes[0].textContent = correct ? '✓ Correct!' : '✗ Wrong';
+  ansDisplay.textContent = correct ? answer : `Answer: ${answer}`;
+  overlay.classList.add('show');
+  setTimeout(() => { overlay.className = 'feedback-overlay'; }, 1800);
+}
+
+function skipSlide() {
+  if (answered) return;
+  answered = true;
+  const slide = quizSlides[currentIndex];
+  score.skipped++;
+  reviewData.push({ id: slide.id, correct: false, correctAnswer: slide.answer, userAnswer: '—', skipped: true });
+  document.getElementById('skip-btn').style.display = 'none';
+  document.getElementById('next-btn').classList.add('show');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('answer-input').disabled = true;
+  const overlay = document.getElementById('feedback-overlay');
+  const pill = document.getElementById('feedback-pill');
+  pill.className = 'feedback-pill wrong';
+  pill.childNodes[0].textContent = '— Skipped';
+  document.getElementById('correct-answer-display').textContent = `Answer: ${slide.answer}`;
+  overlay.classList.add('show');
+  setTimeout(() => { overlay.className = 'feedback-overlay'; }, 2000);
+}
+
+function nextSlide() {
+  currentIndex++;
+  if (currentIndex >= quizSlides.length) { clearInterval(timerInterval); showResults(); }
+  else loadSlide();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter') { answered ? nextSlide() : checkAnswer(); }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  const total = quizSlides.length;
+  const pct = total > 0 ? Math.round((score.correct / total) * 100) : 0;
+
+  document.getElementById('res-correct').textContent = score.correct;
+  document.getElementById('res-wrong').textContent = score.wrong;
+  document.getElementById('res-skipped').textContent = score.skipped;
+  document.getElementById('grade-pct').textContent = pct + '%';
+
+  let letter = 'F', emoji = '💀';
+  if (pct >= 95) { letter = 'A+'; emoji = '🏆'; }
+  else if (pct >= 90) { letter = 'A'; emoji = '⭐'; }
+  else if (pct >= 80) { letter = 'B'; emoji = '💪'; }
+  else if (pct >= 70) { letter = 'C'; emoji = '👍'; }
+  else if (pct >= 60) { letter = 'D'; emoji = '😅'; }
+
+  document.getElementById('grade-letter').textContent = letter;
+  document.getElementById('results-emoji').textContent = emoji;
+  document.getElementById('results-title').textContent = pct >= 80 ? 'Great Job!' : pct >= 60 ? 'Keep Going!' : 'Keep Studying!';
+  document.getElementById('results-sub').textContent = `${score.correct} / ${total} correct (${pct}%)`;
+
+  const circumference = 2 * Math.PI * 70;
+  setTimeout(() => {
+    const circle = document.getElementById('grade-circle');
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+    circle.style.stroke = pct >= 80 ? '#22d68a' : pct >= 60 ? '#ffb84f' : '#ff4f6a';
+  }, 300);
+
+  document.getElementById('review-list').innerHTML = reviewData.map(r => `
+    <div class="review-item">
+      <span class="review-num">#${String(r.id).padStart(3,'0')}</span>
+      <span class="review-icon ${r.correct ? 'review-correct' : 'review-wrong'}">${r.correct ? '✓' : r.skipped ? '—' : '✗'}</span>
+      <div class="review-answers">
+        <div class="review-right-ans">${r.correctAnswer}</div>
+        ${!r.correct && !r.skipped ? `<div class="review-user-ans">You wrote: "${r.userAnswer}"</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  showScreen('results');
+}
+
+function retryMode() { startQuiz(currentMode); }
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function goHome() { clearInterval(timerInterval); showScreen('home'); }
+</script>
+
+</body>
+</html>
